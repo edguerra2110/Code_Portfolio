@@ -1,0 +1,10 @@
+all:proj2_release proj2_debug
+.PHONY: all
+proj2_release: proj2.s
+        gcc -o proj2  proj2.s
+proj2_debug: proj2.s
+        gcc -g -o proj2_debug proj2.s
+.PHONY: clean
+clean:
+        rm proj2_release
+        rm proj2_debug

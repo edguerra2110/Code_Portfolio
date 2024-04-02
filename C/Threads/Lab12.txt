@@ -1,0 +1,35 @@
+#include <stdio.h>
+#include <pthread.h>
+
+static volatile int counter = 0;
+pthread_mutex_t count_lockula = PTHREAD_MUTEX_INITIALIZER;
+
+void *count_worker(void *arg){
+	printf("%s: begin counting\n", (char *) arg);
+
+	int i;
+	for (i = 0; i < 1e7; i++){
+		pthread_mutex_lock(&count_lockula);
+		++counter;
+		pthread_mutex_unlock(&count_lockula);
+	}
+
+	printf("%s: done counting\n", (char *) arg);
+	pthread_exit(0);
+}
+
+int main(){
+	pthread_t t1, t2;
+	pthread_mutex_init(&count_lockula, NULL);
+
+	printf("main thread: begin (counter = %d)\n", counter);
+
+	pthread_create(&t1, NULL, count_worker, "Counter thread 1");
+	pthread_create(&t2, NULL, count_worker, "Counter thread 2");
+
+	pthread_join(t1, NULL);
+	pthread_join(t2, NULL);
+
+	printf("main: done with both counters (counter = %d)\n", counter);
+	return 0;
+}

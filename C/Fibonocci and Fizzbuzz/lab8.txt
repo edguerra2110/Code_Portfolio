@@ -1,0 +1,95 @@
+ /******************************************************************************
+ * File: lab8.c
+ * Programmer: Edgar Guerra (guerrae@etsu.edu
+ * Date: 4/3/21
+ * Purpose: Practice using .c with fizzbuzz, fibonacci sequence, and practice with string formatting
+ *
+ ******************************************************************************/
+
+#include <stdio.h>
+
+// function that prints numbers 1-100. if the number is a multiple of fizz it'll print fizz.
+// if it is a multiple of buzz it will print buzz. if it is both then it will print fizzbuzz
+void fizzbuzz(int fizz, int buzz){
+        int i; // loop counter
+        int isMod; // 1 == true 0 == false
+
+        //loop through 100 times
+        for(i = 1; i < 101; i++){
+                isMod = 0; // set is mod to  false
+                if(i % fizz == 0){ // if i is a multiple of fizz then print "fizz" and set isMod to true
+                        printf("fizz");
+                        isMod = 1;
+                }
+                if(i % buzz == 0){// if i is a multiple of buzz then print "buzz" and set isMod to true
+                        printf("buzz");
+                        isMod = 1;
+                }
+                if(isMod == 0){ // if the number is not  a multiple then just print the number
+                        printf("%i", i );
+                }
+                if(i < 101){ // if i is less than 100 then print a comma
+                        printf(", ");
+                }
+        }
+} // end fizzbuzz
+
+
+
+// function that does the fibonacci sequence.
+//
+void fibonacci( int first, int second, int max ){
+        printf("%i, %i ", first, second);
+        int temp = 0;
+        while(temp < max) {
+                temp = first + second;
+                if(temp <  max){
+                        printf(",%i ", temp);
+                        first = second;
+                        second = temp;
+                }
+
+        }
+
+}// end fibonacci
+// ligns all numbers in the sequence to the right, but repeats each number that number of times.
+void writer ( char num ){
+        char oneDigitSpecifier[5] = "%i";
+        char twoDigitSpecifier[6] = "%02i";
+        int i;
+        int j;
+        int k;
+        char temp = 1;
+	if(num > 10){
+        	temp = 2;
+        }
+        for( i=0; i < num+1; i++ ){
+                
+                for(k=0; k <  (num  - i)*temp && !i == 0; k++ ){
+                        printf(".");
+                }
+                for( j=0; j < i; j++){
+                        if(num < 10){
+                                printf(oneDigitSpecifier, i);
+                        }
+                        else{
+                                printf(twoDigitSpecifier,i);
+                        }
+                }
+                printf("\n");
+        }
+
+
+}// end  writer
+int main (){
+        int x = 3;
+        int y = 5;
+
+        fizzbuzz(x,y);// calling fizzbuzz
+        printf("\n\n");
+        fibonacci(x,y,100);
+        printf("\n\n");
+        writer(11);
+        printf("\n\n");
+        return 0;
+}//end int main

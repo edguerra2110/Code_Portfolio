@@ -1,0 +1,52 @@
+<form class="form-horizontal">
+<fieldset>
+
+<!-- Form Name -->
+<legend>Form Name</legend>
+
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="textinput">First Name:</label>  
+  <div class="col-md-4">
+  <input id="textinput" name="textinput" type="text" placeholder="First name" class="form-control input-md" required="">
+  <span class="help-block">*required</span>  
+  </div>
+</div>
+
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="textinput">Last Name:</label>  
+  <div class="col-md-4">
+  <input id="textinput" name="textinput" type="text" placeholder="Last Name" class="form-control input-md" required="">
+  <span class="help-block">*required</span>  
+  </div>
+</div>
+
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="textinput">Phone:</label>  
+  <div class="col-md-4">
+  <input id="textinput" name="textinput" type="text" placeholder="Phone" class="form-control input-md" required="">
+  <span class="help-block">*required</span>  
+  </div>
+</div>
+
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="textinput">Email:</label>  
+  <div class="col-md-4">
+  <input id="textinput" name="textinput" type="text" placeholder="placeholder" class="form-control input-md">
+    
+  </div>
+</div>
+
+<!-- Textarea -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="textarea">Text Area</label>
+  <div class="col-md-4">                     
+    <textarea class="form-control" id="textarea" name="textarea">Text Area</textarea>
+  </div>
+</div>
+
+</fieldset>
+</form>

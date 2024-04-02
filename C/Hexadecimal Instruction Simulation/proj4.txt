@@ -1,0 +1,512 @@
+/********************************************************************************
+* Program Name: proj4.c
+* Programmer: Edgar Guerra
+* Class: CSCI 2160-001
+* Lab:  Project 4
+* Date: 5/2/2021
+* Purpose: reads a trace of hexadecimal numbers from the standard input, decode each instruction, adjust the program counter, and output
+*          information about each instruction
+******************************************************************************/
+
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <string.h>
+
+
+
+//typedef struct to help us keep up with instruction
+typedef struct instruction {
+        int specifier;          //holds speifier
+        int operand;            //holds operand
+        char mnemonic[10];      //holds mnemonic
+        char instruction_type;  //holds instruction type
+        char reg;               //holds register
+        char addressing_mode[4];//hodds addressing mode
+
+} foo;
+//typedef struct that lets us pass off instruction
+typedef struct myInstruction{
+        int pointer_counter;    //holds pointer
+        int specifier;          //holds specifier
+        int operand1;           //holds operand1
+        int operand2;           //holds operand2
+        int instruction_number; //holds instruction number
+} foobar;
+//struct that holds instructions read
+struct myInstruction read_instruction[255];
+//table to keep up with instruction
+struct instruction instructions[] = {
+        {0X0, 0, "STOP", 'C', ' ',  "U"},
+        {0X1, 0, "RET", 'C', ' ',  "U"},
+        {0X2, 0, "RETTR", 'C', ' ',  "U"},
+        {0X3, 0, "MOVSPA", 'C', 'A', "U"},
+        {0X4, 0, "MOVFLGA", 'C', 'A', "U"},
+        {0X5, 0, "MOVAFLG", 'C', 'A', "U"},
+        {0X6, 0, "NOTA", 'A',  'A', "U"},
+        {0X7, 0, "NOTX", 'A',  'X', "U"},
+        {0X8, 0, "NEGA", 'A',  'A', "U"},
+        {0X9, 0, "NEGX", 'A',  'X', "U"},
+        {0XA, 0, "ASLA", 'A',  'A', "U"},
+        {0XB, 0, "ASLX", 'A',  'X', "U"},
+        {0XC, 0, "ASRA", 'A',  'A', "U"},
+        {0XD, 0, "ASRX", 'A',  'X', "U"},
+        {0XE, 0, "ROLA", 'A',  'A', "U"},
+        {0XF, 0, "ROLX", 'A',  'X', "U"},
+        {0X10, 0, "RORA", 'A',  'A', "U"},
+        {0X11, 0, "RORX", 'A',  'X', "U"},
+        {0X12, 0, "BR", 'C', ' ', "I"},
+        {0X13, 0, "BR", 'C', ' ', "X"},
+        {0X14, 0, "BRLE", 'C', ' ', "I"},
+        {0X15, 0, "BRLE", 'C', ' ', "X"},
+        {0X16, 0, "BRLT", 'C', ' ', "I"},
+        {0X17, 0, "BRLT", 'C', ' ', "X"},
+        {0X18, 0, "BREQ", 'C', ' ', "I"},
+        {0X19, 0, "BREQ", 'C', ' ', "X"},
+        {0X1A, 0, "BRNE", 'C', ' ', "I"},
+        {0X1B, 0, "BRNE", 'C', ' ', "X"},
+        {0X1C, 0, "BRGE", 'C', ' ', "I"},
+        {0X1D, 0, "BRGE", 'C', ' ', "X"},
+        {0X1E, 0, "BRGT", 'C', ' ', "I"},
+        {0X1F, 0, "BRGT", 'C', ' ', "X"},
+        {0X20, 0, "BRV", 'C', ' ', "I"},
+        {0X21, 0, "BRV", 'C', ' ', "X"},
+        {0X22, 0, "BRC", 'C', ' ', "I"},
+        {0X24, 0, "CALL", 'C', ' ', "I"},
+        {0X25, 0, "CALL", 'C', ' ', "X"},
+        {0X26, 0, "NOP0", 'T', ' ', "U"},
+        {0X27, 0, "NOP1", 'T', ' ', "U"},
+        {0X28, 0, "NOP", 'T', ' ', "I"},
+        {0X29, 0, "NOP", 'T', ' ', "I"},
+        {0X2A, 0, "NOP", 'T', ' ', "I"},
+        {0X2B, 0, "NOP", 'T', ' ', "I"},
+        {0X2C, 0, "NOP", 'T', ' ', "I"},
+        {0X2D, 0, "NOP", 'T', ' ', "I"},
+        {0X2E, 0, "NOP", 'T', ' ', "I"},
+        {0X2F, 0, "NOP", 'T', ' ', "I"},
+        {0X31, 0, "DECI", 'T', ' ', "D"},
+        {0X32, 0, "DECI", 'T', ' ', "N"},
+        {0X33, 0, "DECI", 'T', ' ', "S"},
+        {0X34, 0, "DECI", 'T', ' ', "SF"},
+        {0X35, 0, "DECI", 'T', ' ', "X"},
+        {0X36, 0, "DECI", 'T', ' ', "SX"},
+        {0X37, 0, "DECI", 'T', ' ', "SFX"},
+        {0X38, 0, "DECO", 'T', ' ', "I"},
+        {0X39, 0, "DECO", 'T', ' ', "D"},
+        {0X3A, 0, "DECO", 'T', ' ', "N"},
+        {0X3B, 0, "DECO", 'T', ' ', "S"},
+        {0X3C, 0, "DECO", 'T', ' ', "SF"},
+        {0X3D, 0, "DECO", 'T', ' ', "X"},
+        {0X3E, 0, "DECO", 'T', ' ', "SX"},
+        {0X3F, 0, "DECO", 'T', ' ', "SFX"},
+        {0X40, 0, "HEXO", 'T', ' ', "I"},
+        {0X41, 0, "HEXO", 'T', ' ', "D"},
+        {0X42, 0, "HEXO", 'T', ' ', "N"},
+        {0X43, 0, "HEXO", 'T', ' ', "S"},
+        {0X44, 0, "HEXO", 'T', ' ', "SF"},
+        {0X45, 0, "HEXO", 'T', ' ', "X"},
+        {0X46, 0, "HEXO", 'T', ' ', "SX"},
+        {0X47, 0, "HEXO", 'T', ' ', "SFX"},
+        {0X49, 0, "STRO", 'T', ' ', "D"},
+        {0X4A, 0, "STRO", 'T', ' ', "N"},
+        {0X4B, 0, "STRO", 'T', ' ', "S"},
+        {0X4C, 0, "STRO", 'T', ' ', "SF"},
+        {0X4D, 0, "STRO", 'T', ' ', "X"},
+        {0X50, 0, "ADDSP", 'C', ' ', "I"},
+        {0X51, 0, "ADDSP", 'C', ' ', "D"},
+        {0X52, 0, "ADDSP", 'C', ' ', "N"},
+        {0X53, 0, "ADDSP", 'C', ' ', "S"},
+        {0X54, 0, "ADDSP", 'C', ' ', "SF"},
+        {0X55, 0, "ADDSP", 'C', ' ', "X"},
+        {0X56, 0, "ADDSP", 'C', ' ', "SX"},
+        {0X57, 0, "ADDSP", 'C', ' ', "SFX"},
+        {0X58, 0, "SUBSP", 'C', ' ', "I"},
+        {0X59, 0, "SUBSP", 'C', ' ', "D"},
+        {0X5A, 0, "SUBSP", 'C', ' ', "N"},
+        {0X5B, 0, "SUBSP", 'C', ' ', "S"},
+        {0X5C, 0, "SUBSP", 'C', ' ', "SF"},
+        {0X5D, 0, "SUBSP", 'C', ' ', "X"},
+        {0X5E, 0, "SUBSP", 'C', ' ', "SX"},
+        {0X5F, 0, "SUBSP", 'C', ' ', "SFX"},
+        {0X60, 0,  "ADDA", 'A', 'A', "I"},
+        {0X61, 0, "ADDA", 'A', 'A', "D"},
+        {0X62, 0, "ADDA", 'A', 'A', "N"},
+        {0X63, 0, "ADDA", 'A', 'A', "S"},
+        {0X64, 0, "ADDA", 'A', 'A', "SF"},
+        {0X65, 0, "ADDA", 'A', 'A', "X"},
+        {0X66, 0, "ADDA", 'A', 'A', "SX"},
+        {0X67, 0, "ADDA", 'A', 'A', "SFX"},
+        {0X68, 0, "ADDX", 'A', 'X', "I"},
+        {0X69, 0, "ADDX", 'A', 'X', "D"},
+        {0X6A, 0, "ADDX", 'A', 'X', "N"},
+        {0X6B, 0, "ADDX", 'A', 'X', "S"},
+        {0X6C, 0, "ADDX", 'A', 'X', "SF"},
+        {0X6D, 0, "ADDX", 'A', 'X', "X"},
+        {0X6E, 0, "ADDX", 'A', 'X', "SX"},
+        {0X6F, 0, "ADDX", 'A', 'X', "SFX"},
+        {0X70, 0,  "SUBA", 'A', 'A', "I"},
+        {0X71, 0,  "SUBA", 'A', 'A', "D"},
+        {0X72, 0,  "SUBA", 'A', 'A', "N"},
+        {0X73, 0,  "SUBA", 'A', 'A', "S"},
+        {0X74, 0,  "SUBA", 'A', 'A', "SF"},
+        {0X75, 0,  "SUBA", 'A', 'A', "X"},
+        {0X76, 0,  "SUBA", 'A', 'A', "SX"},
+        {0X77, 0,  "SUBA", 'A', 'A', "SFX"},
+        {0X78, 0,  "SUBX", 'A', 'X', "I"},
+        {0X79, 0,  "SUBX", 'A', 'X', "D"},
+        {0X7A, 0,  "SUBX", 'A', 'X', "N"},
+        {0X7B, 0,  "SUBX", 'A', 'X', "S"},
+        {0X7C, 0,  "SUBX", 'A', 'X', "SF"},
+        {0X7D, 0,  "SUBX", 'A', 'X', "X"},
+        {0X7E, 0,  "SUBX", 'A', 'X', "SX"},
+        {0X7F, 0,  "SUBX", 'A', 'X', "SFX"},
+        {0X80, 0,  "ANDA", 'A', 'A', "I"},
+        {0X81, 0,  "ANDA", 'A', 'A', "D"},
+        {0X82, 0,  "ANDA", 'A', 'A', "N"},
+        {0X83, 0,  "ANDA", 'A', 'A', "S"},
+        {0X84, 0,  "ANDA", 'A', 'A', "SF"},
+        {0X85, 0,  "ANDA", 'A', 'A', "X"},
+        {0X86, 0,  "ANDA", 'A', 'A', "SX"},
+        {0X87, 0,  "ANDA", 'A', 'A', "SFX"},
+        {0X88, 0,  "ANDX", 'A', 'X', "I"},
+        {0X89, 0,  "ANDX", 'A', 'X', "D"},
+        {0X8A, 0,  "ANDX", 'A', 'X', "N"},
+        {0X8B, 0,  "ANDX", 'A', 'X', "S"},
+        {0X8C, 0,  "ANDX", 'A', 'X', "SF"},
+        {0X8D, 0,  "ANDX", 'A', 'X', "X"},
+        {0X8E, 0,  "ANDX", 'A', 'X', "SX"},
+        {0X8F, 0,  "ANDX", 'A', 'X', "SFX"},
+        {0X90, 0,  "ORA", 'A', 'A', "I"},
+        {0X91, 0,  "ORA", 'A', 'A', "D"},
+        {0X92, 0,  "ORA", 'A', 'A', "N"},
+        {0X93, 0,  "ORA", 'A', 'A', "S"},
+        {0X94, 0,  "ORA", 'A', 'A', "SF"},
+        {0X95, 0,  "ORA", 'A', 'A', "X"},
+        {0X96, 0,  "ORA", 'A', 'A', "SX"},
+        {0X97, 0,  "ORA", 'A', 'A', "SFX"},
+        {0X98, 0,  "ORX", 'A', 'X', "I"},
+        {0X99, 0,  "ORX", 'A', 'X', "D"},
+        {0X9A, 0,  "ORX", 'A', 'X', "N"},
+        {0X9B, 0,  "ORX", 'A', 'X', "S"},
+        {0X9C, 0,  "ORX", 'A', 'X', "SF"},
+        {0X9D, 0,  "ORX", 'A', 'X', "X"},
+        {0X9E, 0,  "ORX", 'A', 'X', "SX"},
+        {0X9F, 0,  "ORX", 'A', 'X', "SFX"},
+        {0XA0, 0,  "CPWA", 'A', 'A', "I"},
+        {0XA1, 0,  "CPWA", 'A', 'A', "D"},
+        {0XA2, 0,  "CPWA", 'A', 'A', "N"},
+        {0XA3, 0,  "CPWA", 'A', 'A', "S"},
+        {0XA4, 0,  "CPWA", 'A', 'A', "SF"},
+        {0XA5, 0,  "CPWA", 'A', 'A', "X"},
+        {0XA6, 0,  "CPWA", 'A', 'A', "SX"},
+        {0XA7, 0,  "CPWA", 'A', 'A', "SFX"},
+        {0XA8, 0,  "CPWX", 'A', 'X', "I"},
+        {0XA9, 0,  "CPWX", 'A', 'X', "D"},
+        {0XAA, 0,  "CPWX", 'A', 'X', "N"},
+        {0XAB, 0,  "CPWX", 'A', 'X', "S"},
+        {0XAC, 0,  "CPWX", 'A', 'X', "SF"},
+        {0XAD, 0,  "CPWX", 'A', 'X', "X"},
+        {0XAE, 0,  "CPWX", 'A', 'X', "SX"},
+        {0XAF, 0,  "CPWX", 'A', 'X', "SFX"},
+        {0XB0, 0,  "CPBA", 'A', 'A', "I"},
+        {0XB1, 0,  "CPBA", 'A', 'A', "D"},
+        {0XB2, 0,  "CPBA", 'A', 'A', "N"},
+        {0XB3, 0,  "CPBA", 'A', 'A', "S"},
+        {0XB4, 0,  "CPBA", 'A', 'A', "SF"},
+        {0XB5, 0,  "CPBA", 'A', 'A', "X"},
+        {0XB6, 0,  "CPBA", 'A', 'A', "SX"},
+        {0XB7, 0,  "CPBA", 'A', 'A', "SFX"},
+        {0XB8, 0,  "CPBX", 'A', 'X', "I"},
+        {0XB9, 0,  "CPBX", 'A', 'X', "D"},
+        {0XBA, 0,  "CPBX", 'A', 'X', "N"},
+        {0XBB, 0,  "CPBX", 'A', 'X', "S"},
+        {0XBC, 0,  "CPBX", 'A', 'X', "SF"},
+        {0XBD, 0,  "CPBX", 'A', 'X', "X"},
+        {0XBE, 0,  "CPBX", 'A', 'X', "SX"},
+        {0XBF, 0,  "CPBX", 'A', 'X', "SFX"},
+        {0XC0, 0,  "LDWA", 'M', 'A', "I"},
+        {0XC1, 0,  "LDWA", 'M', 'A', "D"},
+        {0XC2, 0,  "LDWA", 'M', 'A', "N"},
+        {0XC3, 0,  "LDWA", 'M', 'A', "S"},
+        {0XC4, 0,  "LDWA", 'M', 'A', "SF"},
+        {0XC5, 0,  "LDWA", 'M', 'A', "X"},
+        {0XC6, 0,  "LDWA", 'M', 'A', "SX"},
+        {0XC7, 0,  "LDWA", 'M', 'A', "SFX"},
+        {0XC8, 0,  "LDWX", 'M', 'X', "I"},
+        {0XC9, 0,  "LDWX", 'M', 'X', "D"},
+        {0XCA, 0,  "LDWX", 'M', 'X', "N"},
+        {0XCB, 0,  "LDWX", 'M', 'X', "S"},
+        {0XCC, 0,  "LDWX", 'M', 'X', "SF"},
+        {0XCD, 0,  "LDWX", 'M', 'X', "X"},
+        {0XCE, 0,  "LDWX", 'M', 'X', "SX"},
+        {0XCF, 0,  "LDWX", 'M', 'X', "SFX"},
+        {0XD0, 0,  "LDBA", 'M', 'A', "I"},
+        {0XD1, 0,  "LDBA", 'M', 'A', "D"},
+        {0XD2, 0,  "LDBA", 'M', 'A', "N"},
+        {0XD3, 0,  "LDBA", 'M', 'A', "S"},
+        {0XD4, 0,  "LDBA", 'M', 'A', "SF"},
+        {0XD5, 0,  "LDBA", 'M', 'A', "X"},
+        {0XD6, 0,  "LDBA", 'M', 'A', "SX"},
+        {0XD7, 0,  "LDBA", 'M', 'A', "SFX"},
+        {0XD8, 0,  "LDBX", 'M', 'X', "I"},
+        {0XD9, 0,  "LDBX", 'M', 'X', "D"},
+        {0XDA, 0,  "LDBX", 'M', 'X', "N"},
+        {0XDB, 0,  "LDBX", 'M', 'X', "S"},
+        {0XDC, 0,  "LDBX", 'M', 'X', "SF"},
+        {0XDD, 0,  "LDBX", 'M', 'X', "X"},
+        {0XDE, 0,  "LDBX", 'M', 'X', "SX"},
+        {0XDF, 0,  "LDBX", 'M', 'X', "SFX"},
+        {0XE1, 0,  "STWA", 'M', 'A', "D"},
+        {0XE2, 0,  "STWA", 'M', 'A', "N"},
+        {0XE3, 0,  "STWA", 'M', 'A', "S"},
+        {0XE4, 0,  "STWA", 'M', 'A', "SF"},
+        {0XE5, 0,  "STWA", 'M', 'A', "X"},
+        {0XE6, 0,  "STWA", 'M', 'A', "SX"},
+        {0XE7, 0,  "STWA", 'M', 'A', "SFX"},
+        {0XE9, 0,  "STWX", 'M', 'X', "D"},
+        {0XEA, 0,  "STWX", 'M', 'X', "N"},
+        {0XEB, 0,  "STWX", 'M', 'X', "S"},
+        {0XEC, 0,  "STWX", 'M', 'X', "SF"},
+        {0XED, 0,  "STWX", 'M', 'X', "X"},
+        {0XEE, 0,  "STWX", 'M', 'X', "SX"},
+        {0XEF, 0,  "STWX", 'M', 'X', "SFX"},
+        {0XF1, 0,  "STBA", 'M', 'A', "D"},
+        {0XF2, 0,  "STBA", 'M', 'A', "N"},
+        {0XF3, 0,  "STBA", 'M', 'A', "S"},
+        {0XF4, 0,  "STBA", 'M', 'A', "SF"},
+        {0XF5, 0,  "STBA", 'M', 'A', "X"},
+        {0XF6, 0,  "STBA", 'M', 'A', "SX"},
+        {0XF7, 0,  "STBA", 'M', 'A', "SFX"},
+        {0XF9, 0,  "STBX", 'M', 'X', "D"},
+        {0XFA, 0,  "STBX", 'M', 'X', "N"},
+        {0XFB, 0,  "STBX", 'M', 'X', "S"},
+        {0XFC, 0,  "STBX", 'M', 'X', "SF"},
+        {0XFD, 0,  "STBX", 'M', 'X', "X"},
+        {0XFE, 0,  "STBX", 'M', 'X', "SX"},
+        {0XFF, 0,  "STBX", 'M', 'X', "SFX"}
+
+};
+
+//typedef struct to keep up with the stats of the instructions
+typedef struct simulation_statistics{
+        int unary;
+        int nonunary;
+        int control;
+        int alu;
+        int trap;
+        int memory;
+        int immediate;
+        int direct;
+        int indirect;
+        int stack_relative;
+        int stack_relative_deferred;
+        int indexed ;
+        int stack_indexed;
+        int stack_deferred_indexed;
+} bar;
+
+//lets us process stuff from read and then save it to the parent
+void logger_process(int read_pipe[], int write_pipe[]){
+        // 0. Initialize stats struct values
+        struct simulation_statistics stats;
+        stats.unary = 0;
+        stats.nonunary = 0;
+        stats.control = 0;
+        stats.alu = 0;
+        stats.trap = 0;
+        stats.memory = 0;
+        stats.immediate = 0;
+        stats.direct = 0;
+        stats.indirect = 0;
+        stats.stack_relative = 0;
+        stats.stack_relative_deferred = 0;
+        stats.indexed = 0;
+        stats.stack_indexed = 0;
+        stats.stack_deferred_indexed = 0;
+        //instruction struct
+        struct instruction decoded;
+        // int to keep up with the while loop
+        int continue_reading = 1;
+        // test for display
+        printf("\nProgram Inst Instruct              Addr\n");
+        printf("Counter Spec Mnemonic     Type Reg Mode Operand\n");
+        printf("------- ---- -------- -------- --- ---- -------\n");
+        //keep up with pc
+        int current_pc;
+        //holds the type for us
+        char type_buffer[8];
+        //while no stop found
+        while (continue_reading){
+        //1a. read program counter from logger pipe
+                read(read_pipe[0], (char *) &current_pc, sizeof(int));
+        //1b. read decoded instruction from logger pipe
+                //pipe[0] is read end; pipe[1] is write end
+                read(read_pipe[0],(char *) &decoded, sizeof(struct instruction));
+        //1c. if instruction is STOP instruction: clear loop flag
+                if(decoded.specifier == 0){
+                        continue_reading = 0;
+                }
+        //2. display information for each read instruction
+                printf("   %04x",current_pc); //displays current pc
+                printf("   %02x",decoded.specifier); //display specifier
+                printf("%9s",decoded.mnemonic); //display mnemonic
+                //section to check what type of instruction we are using and strcpy to buffer
+                if (decoded.instruction_type == 'C'){
+                        strcpy(type_buffer, "Control");
+                        stats.control++;
+                }else if (decoded.instruction_type == 'A'){
+                        strcpy(type_buffer, "ALU");
+                        stats.alu++;
+                }else if (decoded.instruction_type == 'M'){
+                        strcpy(type_buffer, "Memory");
+                        stats.memory++;
+                }else if (decoded.instruction_type == 'T'){
+                        strcpy(type_buffer, "Trap");
+                        stats.trap++;
+                }
+                //printf the buffer, register, and addressing mode
+                printf("%9s", type_buffer);
+                printf("%4c",decoded.reg);
+                printf("%5s",decoded.addressing_mode);
+                // if addressing mode is not unary print the operand
+                if (strncmp(decoded.addressing_mode, "U",1) != 0){
+                        printf("    %04x",decoded.operand);
+                }
+                printf("\n");
+                // if addressing mode is unary
+                if (strncmp(decoded.addressing_mode, "U", 1) == 0){
+                        stats.unary++;
+                }else if (strncmp(decoded.addressing_mode, "I", 1) == 0){ // if immediate
+                        stats.immediate++;
+                        stats.nonunary++;
+                }else if (strncmp(decoded.addressing_mode, "D", 1) == 0){ //else if direct
+                        stats.direct++;
+                        stats.nonunary++;
+                }else if (strncmp(decoded.addressing_mode, "N", 1) == 0){//else if indirect
+                        stats.indirect++;
+                        stats.nonunary++;
+                }else if(strncmp(decoded.addressing_mode, "S", 1) == 0){//else if stack relative
+                        stats.stack_relative++;
+                        stats.nonunary++;
+                }else if (strncmp(decoded.addressing_mode, "SF", 2) == 0){//else if  stack relative deferred
+                        stats.stack_relative_deferred++;
+                        stats.nonunary++;
+                }else if (strncmp(decoded.addressing_mode, "X", 1) == 0){//else if indexed
+                        stats.indexed++;
+                        stats.nonunary++;
+                }else if (strncmp(decoded.addressing_mode, "SX", 2) == 0){//else if  stack indexed
+                        stats.stack_indexed++;
+                        stats.nonunary++;
+                }else if (strncmp(decoded.addressing_mode, "SFX", 3) == 0){//else if stacked deffered index
+                        stats.stack_deferred_indexed++;
+                        stats.nonunary++;
+                }
+        //3. bookkeep instruction state
+        }//end while
+
+        //4. write final statistics to parent process I
+        printf("\nTODO: print final statistics--escaped while loop\n");
+        _exit(0);
+}
+int main(){
+        //pipes
+        int decoder_pipe[2],logger_pipe[2],parent_pipe[2];
+        int pc = 0;
+        int instructionCount = 0;
+        int continue_reading = 1;
+        //if decoder fails then print out error msg and exit
+        if (pipe(decoder_pipe) == -1) {
+                fprintf(stderr, "pipe() failure\n");
+                exit(1);
+        }
+        //if logger pipe fails then print out error msg and exit
+        if (pipe(logger_pipe) == -1){
+                fprintf(stderr, "pipe() failure\n");
+                exit(1);
+        }
+        //if parent pipe fails then print out error msg and exit
+        if (pipe(parent_pipe) == -1){
+                fprintf(stderr, "pipe() failure\n");
+                exit(1);
+        }
+        while(continue_reading){
+                //set the pc to
+                read_instruction[instructionCount].pointer_counter = pc;
+                read_instruction[instructionCount].instruction_number = instructionCount;
+                scanf("%x", &read_instruction[instructionCount].specifier);
+                //if is the stop instruction
+                //if the instruction reads specifier is not the stop specifier
+                //then we read in the next two values and increment the counter
+                if(read_instruction[instructionCount].specifier > 0x12 && read_instruction[instructionCount].specifier != 0x26 && read_instruction[instructionCount].specifier != 0x27){
+                                scanf("%x",&read_instruction[instructionCount].operand1);
+                                scanf("%x",&read_instruction[instructionCount].operand2);
+                                pc+=2;
+                }
+                //it is the stop instruction and we exit the while loop
+                if(read_instruction[instructionCount].specifier == 0){
+                        continue_reading = 0;
+                }
+                pc+=1;
+                instructionCount+=1;
+        }
+        write(decoder_pipe[1], (char *) &instructionCount, sizeof(int));
+        write(decoder_pipe[1], (char *) &read_instruction, sizeof(struct myInstruction) * instructionCount);
+        //create decoder
+        pid_t decoder = fork();
+        if (decoder == -1){
+                fprintf(stderr, "fork() failure\n");
+                exit(1);
+        }
+        //decoder
+        else if (decoder == 0){
+                //go off and decoder stuff
+                //for exit that *should* not be reached: use a unique exit code so the 2 instead of 0 so we cna
+                // test if anything went bad
+                printf("I'm the decoder: %d\n", getpid());
+                //used to keep up with size
+                int size ;
+                read(decoder_pipe[0], (char *) &size, sizeof(int));
+                struct myInstruction deco[size];
+                read(decoder_pipe[0], (char *) &deco, sizeof(struct myInstruction) * size);
+
+                //loop through our table of instructions
+                int i;
+                for(i = 0; i < size; i++){
+                        int j;
+                        //instruction struct to hold decoded values
+                        struct instruction decoded;
+                        for(j=0; j<sizeof(instructions);j++){
+                                //if we found a match then write it out  and break
+                                if(deco[i].specifier == instructions[j].specifier){
+                                        decoded = instructions[j]; // set decoded value to the specifier
+                                        decoded.operand = (deco[i].operand1<<8)|(deco[i].operand2) ; // grab both of our operands and bitwas shift left to account for the extra bits and or the values to get the correct operand 
+                                        write(logger_pipe[1],(char *) &deco[i].pointer_counter, sizeof(int));
+                                        write(logger_pipe[1],(char *) &decoded, sizeof(struct instruction));
+                                        break;
+                                }
+                        }
+                }
+                _exit(2);
+        }
+        //parent
+        pid_t logger = fork();
+        if (logger == -1){
+                fprintf(stderr, "fork() failure \n");
+                exit(1);
+        }
+        //logger
+        else if (logger == 0){
+                printf("I'm the logger: %d\n", getpid());
+                logger_process(logger_pipe, parent_pipe);
+                // unreachable code (hopefull -- on purpose)
+                fprintf(stderr,"Logger escaped -- uh oh.\n");
+                _exit(3);
+        }
+        printf("I'm the parent: %d\n", getpid());
+        int wstatus_first, wstatus_second;
+        wait(&wstatus_first);
+        wait(&wstatus_second);
+        return 0;
+}

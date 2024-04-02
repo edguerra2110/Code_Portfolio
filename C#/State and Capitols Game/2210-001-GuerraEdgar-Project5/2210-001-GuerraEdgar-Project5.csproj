@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C83FEF5B-7589-4575-BCCF-80C347A06B43}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>_2210_001_GuerraEdgar_Project5</RootNamespace>
+    <AssemblyName>2210-001-GuerraEdgar-Project5</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GameForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GameForm.Designer.cs">
+      <DependentUpon>GameForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SplashScreen.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SplashScreen.Designer.cs">
+      <DependentUpon>SplashScreen.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MainDriver.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Text.cs" />
+    <Compile Include="Utility.cs" />
+    <EmbeddedResource Include="GameForm.resx">
+      <DependentUpon>GameForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SplashScreen.resx">
+      <DependentUpon>SplashScreen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\e89ea22ab57572c1ef462e87f8e8203a.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\download.ico" />
+    <Content Include="Resources\State Data\states.txt" />
+    <Content Include="Resources\State Pictures\AlabamaState.jpg" />
+    <Content Include="Resources\State Pictures\AlaskaState.jpg" />
+    <Content Include="Resources\State Pictures\ArizonaState.jpg" />
+    <Content Include="Resources\State Pictures\ArkansasState.jpg" />
+    <Content Include="Resources\State Pictures\CaliforniaState.jpg" />
+    <Content Include="Resources\State Pictures\ColoradoState.jpg" />
+    <Content Include="Resources\State Pictures\ConnecticutState.jpg" />
+    <Content Include="Resources\State Pictures\DelawareState.jpg" />
+    <Content Include="Resources\State Pictures\FloridaState.jpg" />
+    <Content Include="Resources\State Pictures\GeorgiaState.jpg" />
+    <Content Include="Resources\State Pictures\HawaiiState.jpg" />
+    <Content Include="Resources\State Pictures\IdahoState.jpg" />
+    <Content Include="Resources\State Pictures\IllinoisState.jpg" />
+    <Content Include="Resources\State Pictures\IndianaState.jpg" />
+    <Content Include="Resources\State Pictures\IowaState.jpg" />
+    <Content Include="Resources\State Pictures\KansasState.jpg" />
+    <Content Include="Resources\State Pictures\KentuckyState.jpg" />
+    <Content Include="Resources\State Pictures\LouisianaState.jpg" />
+    <Content Include="Resources\State Pictures\MaineState.jpg" />
+    <Content Include="Resources\State Pictures\MarylandState.jpg" />
+    <Content Include="Resources\State Pictures\MassachusettsState.jpg" />
+    <Content Include="Resources\State Pictures\MichiganState.jpg" />
+    <Content Include="Resources\State Pictures\MinnesotaState.jpg" />
+    <Content Include="Resources\State Pictures\MississippiState.jpg" />
+    <Content Include="Resources\State Pictures\MissouriState.jpg" />
+    <Content Include="Resources\State Pictures\MontanaState.jpg" />
+    <Content Include="Resources\State Pictures\NebraskaState.jpg" />
+    <Content Include="Resources\State Pictures\NevadaState.jpg" />
+    <Content Include="Resources\State Pictures\NewHampshireState.jpg" />
+    <Content Include="Resources\State Pictures\NewJerseyState.jpg" />
+    <Content Include="Resources\State Pictures\NewMexico.jpg" />
+    <Content Include="Resources\State Pictures\NewYorkState.jpg" />
+    <Content Include="Resources\State Pictures\NorthCarolinaState.jpg" />
+    <Content Include="Resources\State Pictures\NorthDakotaState.jpg" />
+    <Content Include="Resources\State Pictures\OhioState.jpg" />
+    <Content Include="Resources\State Pictures\OklahomaState.jpg" />
+    <Content Include="Resources\State Pictures\OregonState.jpg" />
+    <Content Include="Resources\State Pictures\PennsylvaniaState.jpg" />
+    <Content Include="Resources\State Pictures\RhodeIslandState.jpg" />
+    <Content Include="Resources\State Pictures\SouthCarolinaState.jpg" />
+    <Content Include="Resources\State Pictures\SouthDakotaState.jpg" />
+    <Content Include="Resources\State Pictures\TennesseeState.jpg" />
+    <Content Include="Resources\State Pictures\TexasState.jpg" />
+    <Content Include="Resources\State Pictures\UtahState.jpg" />
+    <Content Include="Resources\State Pictures\VermontState.jpg" />
+    <Content Include="Resources\State Pictures\VirginiaState.jpg" />
+    <Content Include="Resources\State Pictures\WashingtonState.jpg" />
+    <Content Include="Resources\State Pictures\WestVirginiaState.jpg" />
+    <Content Include="Resources\State Pictures\WisconsinState.jpg" />
+    <Content Include="Resources\State Pictures\WyomingState.jpg" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

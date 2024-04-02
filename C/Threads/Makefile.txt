@@ -1,0 +1,10 @@
+all: 			lab12_release 	hello_thread
+.PHONY: 		all
+lab12_release: 		lab12.c
+			gcc -o lab12 lab12.c -pthread
+hello_release: 		hello_thread.c
+			gcc -o hello hello_thread.c -pthread
+.PHONY: 		clean
+clean:
+			rm lab12_release 
+			rm hello_release

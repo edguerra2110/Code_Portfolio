@@ -1,0 +1,11 @@
+all:					fork_release 	parent_release
+.PHONY:					all
+fork_release: 				hello_fork.c
+					gcc -o fork hello_fork.c
+parent_release:				parent_child.c
+					gcc -o parent parent_child.c
+.PHONY:					clean
+clean:	
+					rm fork_release 
+					rm parent_release
+

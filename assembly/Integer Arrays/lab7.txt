@@ -1,0 +1,88 @@
+ /******************************************************************************
+ * File: lab7.s
+ * Programmer: Edgar Guerra (guerrae@etsu.edu
+ * Date: 3/17/21
+ * Purpose: this lab will give you some practice working with integer arrays and with the gdb utility to observe how your lab behaves.
+ *
+ ******************************************************************************/
+        .syntax unified
+@-----------------------------------------------------------------------------
+        .data
+ptrUserInput:
+        .word 0         @ holds the address of a user input string
+array:
+        .space 5*4      @ allocates 32-bits for the array
+stringBuffer:
+        .space 10       @allocate a 10 byte buffer for an input string
+@ -----------------------------------------------------------------------------
+        .text
+        .type main, %function
+        .global main
+main:
+        /* Stack the return address (in lr) as well as four extra bytes (ip)
+        to keep the stack 8-byte aligned. */
+        PUSH    {ip, lr}
+        /*3.  greet the user (via printf): */
+        LDR     r0, =greeting                                           @ r0 -> first byte of prompt
+        BL      printf                                                  @ display sring input prompt
+        /*prompt user to input the 5 ints */
+        LDR     r0, =intsPrompt                                         @ r0 -> first byte of ints prompt
+        BL      printf                                                  @ display the sprint input
+        LDR     r5, =array+16                                           @ r5 -> fifth int
+        LDR     r4, =array+12                                           @ r4 -> fourth int
+        PUSH    {r4,r5}                                                 @ push r4 and r5 to the stack
+        LDR     r3, =array+8                                            @ r3 -> third int
+        LDR     r2, =array+4                                            @ r2 -> second int
+        LDR     r1, =array                                              @ r1 -> first int
+        LDR     r0, =intsSpecifier                                      @ r0 -> format specifier
+        BL      scanf                                                   @ read in the user input
+        ADD     SP, #8                                                  @ clear up allocated storage
+        /*continue from step 5*/
+        LDR     r0, =displayArray                                       @ r0 -> first byte of display array
+        BL      printf                                                  @ display header for input array
+
+        MOV     r4, #5                                                  @ r4 == loop control variable 5
+        LDR     r5, =array                                              @ r5 -> first int in the array
+displayInts:
+        LDR     r1, [r5], #4                                            @ r1 = current int; r5 -> next int
+        LDR     r0,=displayArrayElement                                 @ first byte of specifier
+        BL      printf                                                  @ display array element
+        SUBS    r4, #1                                                  @ decrement for by 1
+        BNE     displayInts                                             @ branch if not equal back to display ints
+        LDR     r0, =newLine                                            @ r0 -> newline
+        BL      printf                                                  @ print newline
+        LDR     r0, =displayArrayReverse                                @ r0 -> array reverse text
+        BL      printf                                                  @ print array header
+        MOV     r4, #5
+        LDR     r5, =array+16                                           @end of array
+displayIntsReverse:
+        LDR     r1, [r5], #-4                                           @r1 == current item in array
+        LDR     r0, =displayArrayElement
+        BL      printf
+        SUBS    r4, #1
+        BNE     displayIntsReverse
+        LDR     r0, =newLine
+        BL      printf
+/* Exit from main: */
+        MOV r0, #0 @ "return 0;"
+        /* Return control to the shell by popping the extra bytes back into
+        (ip), then the return address into the Program Counter (pc) */
+        POP {ip, pc}
+@ -----------------------------------------------------------------------------
+        .section .rodata
+        /* Greeting displayed on start of the program. */
+greeting:
+        .ascii "\tName: Edgar Guerra\n"
+        .asciz "\t Lab: Lab 7\n\n"
+intsPrompt:
+        .asciz "Please input 5 4-byte integers, each sperated by a space: "
+intsSpecifier:
+        .asciz "%i %i %i %i %i"
+displayArray:
+        .asciz "\nThe array of number you entered: \n"
+displayArrayElement:
+        .asciz "%d  "
+newLine:
+        .asciz "\n\n"
+displayArrayReverse:
+        .asciz "\nThe array of numbers you entered in reverse are: \n"

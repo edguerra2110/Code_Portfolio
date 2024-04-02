@@ -1,0 +1,24 @@
+#include <stdio.h>
+#include <pthread.h>
+
+void *mythread(void *arg){
+	printf("%s\n", (char *) arg);
+	pthread_exit(0);
+}
+
+int main(){
+	pthread_t t1, t2;
+	printf("main thread: start\n");
+
+	// create hello threads
+	pthread_create(&t1, NULL, mythread, "Thread 1 reporting in!");
+	pthread_create(&t2, NULL, mythread, "Thread 2 reporting in!");
+
+	// wait for threads to finish
+	pthread_join(t1, NULL);
+	pthread_join(t2, NULL);
+
+	printf("main thread: end\n");
+	return 0;
+
+}

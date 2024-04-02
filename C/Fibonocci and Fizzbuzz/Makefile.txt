@@ -1,0 +1,10 @@
+all:            lab8_release    lab8_debug
+.PHONY:         all
+lab8_release:   lab8.c
+                gcc -o lab8  lab8.c
+lab8_debug:     lab8.c
+                gcc -g -o lab8_debug lab8.c
+.PHONY:         clean
+clean:
+                rm lab8_release
+                rm lab8_debug

@@ -1,0 +1,10 @@
+all:lab7_release lab7_debug
+.PHONY: all
+lab7_release: lab7.s
+        gcc -o lab7  lab7.s
+lab7_debug: lab7.s
+        gcc -g -o lab7_debug lab7.s
+.PHONY: clean
+clean:
+        rm lab7_release
+        rm lab7_debug

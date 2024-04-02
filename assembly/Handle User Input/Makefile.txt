@@ -1,0 +1,10 @@
+all:lab6_release lab6_debug
+.PHONY: all
+lab6_release: lab6.s
+        gcc -o lab6  lab6.s
+lab6_debug: lab6.s
+        gcc -g -o lab6_debug lab6.s
+.PHONY: clean
+clean:
+        rm lab6_release
+        rm lab6_debug

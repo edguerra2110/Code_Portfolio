@@ -1,0 +1,87 @@
+ /******************************************************************************
+ * File: lab6.s
+ * Programmer: Edgar Guerra (guerrae@etsu.edu
+ * Date: 3/14/21
+ * Purpose: Demonstrates how to handle user input via format specifiers in
+ * scanf and user output via printf.
+ ******************************************************************************/
+        .syntax unified
+@-----------------------------------------------------------------------------
+        .data
+ptrUserInput:
+        .word 0         @ holds the address of a user input string
+stringBuffer:
+        .space 10       @allocate a 10 byte buffer for an input string
+@ -----------------------------------------------------------------------------
+        .text
+        .type main, %function
+        .global main
+main:
+        /* Stack the return address (in lr) as well as four extra bytes (ip)
+        to keep the stack 8-byte aligned. */
+        PUSH    {ip, lr}
+        /*3.  greet the user (via printf): */
+        LDR     r0, =greeting                                           @ r0 -> first byte of prompt
+        BL      printf                                                  @ display sring input prompt
+        /*4. Prompt and accept input of a user-specified string (ia scanf) */
+        LDR     r0, =stringPrompt                                       @ r0 -> first byt of prompt
+        BL      printf                                                  @ display string input prompt
+        LDR     r1, =ptrUserInput                                       @ r1 -> holder for string address
+        LDR     r0, =stringSpecifier                                    @ r0 -> first byte of format spec.
+        BL      scanf                                                   @ read in user input and store
+        /*6.Display the user-input string to the standard output  */
+        LDR     r1, =ptrUserInput                                       @ r1 -> ptrUserInput
+        LDR     r1, [r1]                                                @ r0 -> first byte of user-input string
+        LDR     r0, =displayUserString                                  @r0 -> first byte of specifier
+        BL      printf                                                  @ display user
+        /*5. Free the user-specified string on the heap */
+        LDR     r1, =ptrUserInput                                       @ r1 -> address for user-input string
+        LDR     r0, [r1]                                                @ r0 -> first byte of user input string
+        BL      free                                                    @ User input freed from heap
+        /*8. Propmt and accept input of a second string -- for a static buffer. */
+        LDR     r0, =stringPrompt       @ r0 -> first byte of prompt
+        BL      printf                  @ display string input prompt
+        /*10.call scanf to accept input of this second user input */
+        LDR     r1, =stringBuffer               @ r1 -> first byte of string buffer
+        LDR     r0, =staticStringSpecifier      @ r0 -> first byte of string specifier
+        BL      scanf
+        /*11. display user input*/
+        LDR     r1, =stringBuffer               @ r1 -> first byte of string buffer
+        LDR     r0, =displayUserString          @r0 -> outpue user string
+        BL      printf                          @display static Buffer string
+        /*13. take in user input */
+        LDR     r0, =stringPrompt
+        BL      printf
+        LDR     r1,=ptrUserInput
+        LDR     r0,=characterSpecifier
+        BL      scanf
+        /*14. display user input */
+        LDR     r1, =ptrUserInput
+        LDR     r1, [r1]
+        LDR     r0, =displayUserString
+        BL      printf
+        /*15. free user input */
+        LDR     r1, =ptrUserInput
+        LDR     r0, [r1]
+        BL      free
+/* Exit from main: */
+        MOV r0, #0 @ "return 0;"
+        /* Return control to the shell by popping the extra bytes back into
+        (ip), then the return address into the Program Counter (pc) */
+        POP {ip, pc}
+@ -----------------------------------------------------------------------------
+        .section .rodata
+        /* Greeting displayed on start of the program. */
+greeting:
+        .ascii "\tName: Edgar Guerra\n"
+        .asciz "\t Lab: Lab 6\n\n"
+stringPrompt:
+        .asciz "Please input a string (without whitespace): "
+stringSpecifier:
+        .asciz "%ms"
+displayUserString:
+        .asciz "\nYou entered: %s\n"
+staticStringSpecifier:
+        .asciz "%9s"
+characterSpecifier:
+        .asciz " %m[^\n]c"

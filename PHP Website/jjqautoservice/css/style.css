@@ -1,0 +1,191 @@
+<style>
+	/*****************************************************
+		SITE WIDE CSS
+	******************************************************/
+	p {
+		font-size:12px!important;
+	}
+	.button{
+		text-decoration: none!important;
+		color: white;
+		float: right;
+		padding: 20px 15px 20px 15px;
+		background-color: #606060;
+		text-align: center;
+		width: 150px;
+	}
+	.button2{
+		text-decoration: none!important;
+		color: white;
+		float: right;
+		padding: 20px 15px 20px 15px;
+		background-color: #D68227;
+		text-align: center;
+		width: 150px;
+	}
+	.button2:hover{
+		color:white;
+		background-color:#016088;
+	}
+	
+	.button:hover{
+		color:white;
+		background-color:#016088;
+	}
+	
+	.theTitle
+	{
+		margin-bottom: 25px;
+	}
+	/*****************************************************
+		HEADING CSS
+	******************************************************/
+	div.headContainer.container div.headBar.row {
+		font-size: 12px!important;
+	}
+	div.headContainer img.logo {
+		width:300px; height:auto;
+	}
+	div.addressDiv {
+		text-align:left;
+	
+	}
+	div.iconDiv {
+		text-align:right;
+	}
+	.center {
+	  display: block;
+	  margin-left: auto;
+	  margin-right: auto;
+	  width: 50%;
+	}
+	div.headContainer.container {
+		max-width:100%!important;
+	}
+	nav.container a{
+		text-align:center;
+		color:white;
+		background-color:#D68227;
+		text-decoration:none;
+		padding:7px 15px;
+		margin: 0px;
+		border-radius: 10px;
+		width:17%;
+		margin-left: 5px;
+	}
+	nav.container a:hover{
+		color:#D68227;
+		background-color:white;
+		
+	}
+	nav.container.menu{
+		display:block;
+		margin-left:auto;
+		margin-right:auto;
+		
+	}
+	div.navigationBar{
+		background-color:#606060;
+		padding:20px;
+	}
+	/**************************************** 
+		HERO IMAGE CSS
+	******************************************/
+	.heroImage {
+   
+	position:relative;
+	overflow:hidden;
+	}
+
+	div.heroImage img {
+		
+	min-width: 100%;
+	height: auto;
+	margin-bottom:-25%;
+	}
+	.HeroTextBox {
+    padding: 40px;
+	z-index: 100;
+	position: absolute;
+	left: 30%;
+	top: 55%;
+    background-color: rgba(0,0,0,0.7);
+    margin-left: auto;
+    margin-right: auto;
+    width: 41%; 
+    color: white;
+	}
+	div.HeroTextBox a.herobtn.button {
+		text-decoration: none;
+		color: white;
+		float: right;
+		padding: 20px 15px 20px 15px;
+		background-color: #606060;
+		text-align: center;
+		width: 150px;
+	}
+	div.HeroTextBox a.herobtn.button:hover {
+		color:white;
+		background-color:#D68227;
+		
+	}
+	/*****************************************************
+		HOME CSS
+	******************************************************/
+	
+	div.serviceSection h3{
+		
+		text-align:center;
+		padding:5px 0px;
+		background:#606060;
+		color:white;
+	}
+	div.serviceSection{
+		padding-top:20px;
+		padding-bottom:20px;
+		background-color:#D68227;
+		color:black;
+	}
+	div.serviceSection img{
+		width:100%;
+		height:200px;
+		
+	}
+	.serviceSection .service {
+		background: white;
+		padding: 0px;
+		margin: 0px 5px;
+	}
+	.service p {
+		padding: 10px;
+		
+	}
+	.serviceSection .row {
+		flex-wrap: nowrap;
+	}
+	.reviewsContainer {
+    margin: 30px 0px 30px 0px;
+	}
+
+	.container blockquote {
+		margin: 30px 0px 30px 0px;
+		
+	}
+	.aboutUsContainer {
+		background: #606060;
+		color: white;
+		padding-bottom: 20px;
+		margin-top: 50px; 
+		padding-top: 20px;
+	}
+
+	.aboutUsContainer .row {
+		padding-top: 50px;
+		margin-bottom: 20px;
+		margin-top: 20px;
+	}
+	cite {
+    color: d68227;
+    font-weight: bold;
+	}
+</style>

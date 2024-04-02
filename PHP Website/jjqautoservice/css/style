@@ -1,0 +1,47 @@
+<style>
+	div.headContainer.container div.headBar.row {
+		font-size: 12px;
+	}
+	div.headContainer img.logo {
+		width:350px; height:auto; padding-top:25px; padding-bottom:25px;
+	}
+	div.addressDiv {
+		text-align:left;
+	
+	}
+	div.iconDiv {
+		text-align:right;
+	}
+	.center {
+	  display: block;
+	  margin-left: auto;
+	  margin-right: auto;
+	  width: 50%;
+	}
+	div.headContainer.container {
+		max-width:100%!important;
+	}
+	nav.container a{
+		color:white;
+		background-color:#D68227;
+		text-decoration:none;
+		padding:7px 15px;
+		margin: 20px 15px;
+		border-radius: 10px;
+	}
+	nav.container a:hover{
+		color:#D68227;
+		background-color:white;
+		
+	}
+	nav.container.menu{
+		display:block;
+		margin-left:auto;
+		margin-right:auto;
+		width:50%;
+	}
+	div.navigationBar{
+		background-color:#A7A3AA;
+		padding:20px;
+	}
+</style>

@@ -1,0 +1,50 @@
+#include <string.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <stdlib.h>
+#include <stdio.h>
+typedef struct message {
+	pid_t pid;
+	char payload[64];
+} foo;
+
+int main(){
+	int mypipe[2];
+	if (pipe(mypipe) == -1){
+		fprintf(stderr, "pipe (0 failed)\n");
+		exit(1);
+	}
+
+	pid_t value = fork();
+	if (value == -1){
+		fprintf(stderr, "fork() failed.\n");
+		exit(1);
+	}
+	// child code
+	else if (value == 0){
+		struct message m = {getpid(), "Hello from struct!\n"};
+		// pid_t child_pid = getpid();
+		m.pid = getpid();
+		printf("PID: %d\nPPID: %d\n", m.pid, getppid());
+		// write(mypipe[1], "Hello from a pipe!\n", 20);
+		strcpy(m.payload, "Hello from a struct!\n");
+		write(mypipe[1], (char *)&m, sizeof(struct message)); 
+		_exit(0);
+	}
+	// parent
+	else{
+		// char read_buf[64];
+		struct message read_msg;
+		read(mypipe[0], (char *)&read_msg, sizeof(struct message));
+		// pid_t sent_pid;
+		// read(mypipe[0], (char *)&sent_pid, sizeof(pid_t));
+
+		printf("Message: %s\nChild PID: %d\n", read_msg.payload, read_msg);
+		int wstatus;
+		printf("Before reaping child\n");
+		wait(&wstatus);
+		printf("After reaping child\n");
+		exit(0);
+	}
+	return 0;
+}

@@ -1,0 +1,200 @@
+/******************************************************************************
+ * File: proj2.s
+ * Programmer: Edgar Guerra (guerrae@etsu.edu
+ * Date: 3/19/21
+ * Purpose: program that does matrix multiplication
+ *
+ ******************************************************************************/
+        .syntax unified
+@-----------------------------------------------------------------------------
+        .data
+matrixA:
+        .space 25*4             @ holds matrixA
+matrixB:
+        .space 25*4             @ holds matrixB
+matrixC:
+        .space 50*4             @ holds the result of matrix  A and B
+rowsA:
+        .word 0         @ holds the rows number of rows in A
+columnsA:
+        .word 0         @holds the number of columns for A
+rowsB:
+        .word 0         @holds the number of rows in B
+columnsB:
+        .word 0         @holds the number of columns
+@ -----------------------------------------------------------------------------
+        .text
+        .type main, %function
+        .global main
+main:
+        /* Stack the return address (in lr) as well as four extra bytes (ip)
+        to keep the stack 8-byte aligned. */
+        PUSH    {ip, lr}
+        LDR     r0, =greeting                                           @ r0 -> first byte of prompt
+        BL      printf                                                  @ display string input prompt
+        LDR     r0, =matrixASizePrompt                                  @ r0 -> matrixAsizePrompt
+        BL      printf                                                  @ print the prompt
+        LDR     r0, =matrixSizeSpecifier                                @ used to read in the matrix's size
+        LDR     r1, =rowsA                                              @ save the rows of a
+        LDR     r2, =columnsA                                           @ save the columns of a
+        BL      scanf
+        LDR     r0, =matrixAValuesPrompt                                @ r0 -> matrixAsizePrompt
+        BL      printf                                                  @ print the prompt
+        LDR     r4, =rowsA                                              @ r4 -> rowsA
+        LDR     r4, [r4]                                                @ r4 -> value at r4
+        LDR     r5, =columnsA                                           @ r5 -> columnsA
+        LDR     r5, [r5]                                                @ r5 -> value at r5
+        MUL     r6, r4, r5                                              @ mult row x column to get total values
+        LDR     r7, =matrixA                                            @ r7 -> start of matrixA
+for1:                                                                   @ loop through the values
+        CMP     r6, #0                                                  @ check we've been through all of the values
+        BLE     endfor1                                                 @ if we have. break out
+        LDR     r0, =matrixValueSpecifier                               @ load in value specifier
+        MOV     r1, r7                                                  @ move next address to r1
+        BL      scanf                                                   @ read in value
+        SUB     r6, r6, #1                                              @ subtract 1 from our  total values
+        ADD     r7, r7, #4                                              @ move to next location in matrixA
+        B       for1                                                    @ brance back to loop
+endfor1:
+        LDR     r0, =matrixBSizePrompt                                  @ r0 -> matrixAsizePrompt
+        BL      printf                                                  @ print the prompt
+        LDR     r0, =matrixSizeSpecifier                                @ used to read in the matrix's size
+        LDR     r1, =rowsB                                              @ save the rows of a
+        LDR     r2, =columnsB                                           @ save the columns of a
+        BL      scanf                                                   @ read in values
+        LDR     r6, =rowsB                                              @ r6 -> beginning of rowsB
+        LDR     r6, [r6]                                                @ r4 = value at r4
+        LDR     r7, =columnsB                                           @ r7 -> beginning of columnsB
+        LDR     r7, [r7]                                                @ r7 = columnsB
+        CMP     r5, r6                                                  @ compare columnsA with rowsB
+        BNE     error
+        LDR     r0, =matrixBValuesPrompt                                @ r0 -> matrixAsizePrompt
+        BL      printf                                                  @ print the prompt
+        LDR     r4, =rowsB                                              @ r4 -> rowsB
+        LDR     r4, [r4]                                                @ r4 = rowsB
+        LDR     r5, =columnsB                                           @ r5 -> columnsB
+        LDR     r5, [r5]                                                @ r5 = columnsB
+        MUL     r6, r4, r5                                              @ mult row x column to get total values
+        LDR     r7, =matrixB                                            @row x column to get total values
+for2:                                                                   @ loop through the values
+        CMP     r6, #0                                                  @ check if the all the values have been read in
+        BLE     endfor2                                                 @ if they have then break out
+        LDR     r0, =matrixValueSpecifier                               @ load in value specifier
+        MOV     r1, r7                                                  @ move next address to r1
+        BL      scanf                                                   @ read in value
+        SUB     r6, r6, #1                                              @ subtract 1 from our total values
+        ADD     r7, r7, #4                                              @ move to next location in matrixB
+        B       for2                                                    @ branch back to beginning
+endfor2:                                                                @ end loop
+        LDR     r4, =matrixA                                            @ r4 -> beginning of matrixA
+        LDR     r5, =rowsA                                              @ r5 -> beginning of rowsA
+        LDR     r5, [r5]                                                @ r5 = rowsA
+        LDR     r6, =columnsA                                           @ r6 -> beginning of columnsA
+        LDR     r6, [r6]                                                @ r6 = columnsA
+        LDR     r7, =matrixB                                            @ r7 -> beginning of matrixB
+        LDR     r8, =rowsB                                              @ r8 -> beginning of rowsB
+        LDR     r8, [r8]                                                @ r8 = rowsB
+        LDR     r9, =columnsB                                           @ r9 -> beginning of columnsB
+        LDR     r9, [r9]                                                @ r9 = coumnsB
+        MOV     r0, #0                                                  @ set r0 to 0
+for3:                                                                   @ loop through rows a
+        CMP     r0, r5                                                  @ compare r0 to rows a
+        BGE     endfor3                                                 @ break if we've been to all the rows
+        MOV     r1, #0                                                  @ set r1 to 0
+for4:                                                                   @ loop through the columns
+        CMP     r1, r9                                                  @ compare columnsB to 0
+        BGE     endfor4                                                 @ break if we've been to all the columns
+        MOV     r2, #0                                                  @ set r2 to 0
+        MOV     r3, #0                                                  @ set r3 to 0
+for5:                                                                   @ loop through all the columns in A
+        MOV     r12, #4                                                 @ set r12 to 4
+        CMP     r3, r6                                                  @ check if we've been through all the columns
+        BGE     endfor5                                                 @ if we have then leave
+        MUL     r10, r0, r6                                             @ r10 - > current row times columns in A to get offset
+        ADD     r10, r10, r3                                            @ add columns a to position into r11
+        MUL     r11, r10, r12                                           @ r11 ->  multiply position of row
+        ADD     r11, r11, r4                                            @ add the offset positon to r11
+        LDR     r10, [r11]                                              @ r10 = value of matrix A
+        MUL     r11, r9, r3                                             @ multiply number of columns times current column
+        ADD     r11, r11, r1                                            @ add the current column
+        PUSH    {r0}                                                    @ push the r0 to stack to preserve the value
+        MUL     r0, r11, r12                                            @ mult current column times position
+        ADD     r0, r0, r7                                              @ add the total rowsB
+        LDR     r11, [r0]                                               @ r11 = value of matrix B
+        POP     {r0}                                                    @ pop the r0 back out to get the value
+        MOV     r12, #0                                                 @ clear up r12
+        SMULL   r12, r11, r11,r10                                       @ multiply the values together
+        CMP     r11, r12, ASR #31                                       @ check if there was an overflow
+        BNE     overflow                                                @ overflow detected
+        ADD     r2, r2, r12                                             @ add the result to r2
+        ADD     r3, r3, #1                                              @ increment our column counter by 1
+        B       for5                                                    @ branch back to for5
+endfor5:                                                                @ end loop 5
+        PUSH    {r0-r12}                                                @ push the all registers to stack so we can print result
+        LDR     r0, =matrixValueSpecifier                               @ r0 -> beginning of matrixValueSpecifier
+        MOV     r1, r2                                                  @ set result to r1
+        BL      printf                                                  @ print the result
+        POP     {r0-r12}                                                @ pop the registers back
+        SUB     r10, r9, #1                                             @ sub 1 from columns b and put it in r10
+        CMP     r1, r10                                                 @ check if its the end
+        BGE     noSpace                                                 @ no space needed so branch out
+        PUSH    {r0-r12}                                                @ push the registers to the stack
+        LDR     r0, =space                                              @ r0 -> space
+        BL      printf                                                  @ print the space
+        POP     {r0-r12}                                                @ pop the registers back
+noSpace:                                                                @ no space needed
+        ADD     r1, r1, #1                                              @ add 1 to columns tracker
+        B       for4                                                    @ branch to for4
+endfor4:                                                                @ endfor4
+        SUB     r10, r5, #1                                             @ subtract 1 from columnsA
+        CMP     r0, r10                                                 @ check if it is the end
+        BGE     noNewLine                                               @ if its not then branch out
+        PUSH    {r0-r12}                                                @ push the registers to the stack
+        LDR     r0, =newLine                                            @ r0 -> newLine
+        BL      printf                                                  @ print the newline character
+        POP     {r0-r12}                                                @ pop the items back out
+noNewLine:                                                              @ no newline
+        ADD r0, r0, #1                                                  @ increment the columns by 1
+        B for3                                                          @ branch back to for3
+endfor3:                                                                @ end for3
+        LDR     r0,=newLine                                             @ end of matrix new line.
+        BL      printf                                                  @ print new line
+        B nomas                                                         @ branch to end
+error:                                                                  @ error msg
+        LDR     r0, =matrixError                                        @ r0 -> matrixError
+        BL      printf                                                  @ print error
+overflow:                                                               @overflow msg
+        LDR     r0, =overFlowError                                      @ r0 -> overFlowError
+        /* Exit from main: */
+nomas:  MOV r0, #0 @ "return 0;"
+        /* Return control to the shell by popping the extra bytes back into
+        (ip), then the return address into the Program Counter (pc) */
+        POP {ip, pc}
+@ -----------------------------------------------------------------------------
+        .section .rodata
+        /* Greeting displayed on start of the program. */
+greeting:
+        .ascii "\t   Name: Edgar Guerra\n"
+        .asciz "\tProject: Project2\n\n"
+matrixASizePrompt:
+        .asciz "Input matrix A's size:\n"
+matrixBSizePrompt:
+        .asciz "Input matrix B's size:\n"
+matrixAValuesPrompt:
+        .asciz "Input matrix A's values:\n"
+matrixBValuesPrompt:
+        .asciz "Input matrix B's values:\n"
+matrixError:
+        .asciz "Please input two valid matrices."
+matrixSizeSpecifier:
+        .asciz "%d %d"
+matrixValueSpecifier:
+        .asciz "%10d"
+displayArrayElement:
+        .asciz "%d  "
+newLine:
+        .asciz "\n"
+space:
+        .asciz " "
+overFlowError:
+        .asciz "There was overflow."
